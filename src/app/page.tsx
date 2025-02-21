@@ -12,6 +12,7 @@ declare global {
 }
 
 import * as tf from '@tensorflow/tfjs';
+import detectorModel from './assets/model/detector';
 
 export default function FingerspellingDetection() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -45,7 +46,7 @@ export default function FingerspellingDetection() {
     const handsfree = new window.Handsfree({
       hands: {
         enabled: true,
-        maxNumHands: 2,
+        maxNumHands: 1,
         minDetectionConfidence: 0.7,
         minTrackingConfidence: 0.5
       },
@@ -54,129 +55,34 @@ export default function FingerspellingDetection() {
       pose: false
     });
 
-    // Define the custom gesture for 'A'
-    handsfree.useGesture({
-      name: "A",
-      algorithm: "fingerpose",
-      models: "hands",
-      confidence: 7.5,
-      description: [
-        ["addCurl", "Thumb", "NoCurl", 1],
-        ["addDirection", "Thumb", "VerticalUp", 0.875],
-        ["addDirection", "Thumb", "DiagonalUpLeft", 1],
-        ["addCurl", "Index", "FullCurl", 1],
-        ["addDirection", "Index", "VerticalUp", 1],
-        ["addCurl", "Middle", "FullCurl", 1],
-        ["addDirection", "Middle", "VerticalUp", 1],
-        ["addDirection", "Middle", "DiagonalUpLeft", 0.07142857142857142],
-        ["addCurl", "Ring", "FullCurl", 1],
-        ["addDirection", "Ring", "VerticalUp", 1],
-        ["addCurl", "Pinky", "FullCurl", 1],
-        ["addDirection", "Pinky", "DiagonalUpRight", 1],
-        ["addDirection", "Pinky", "VerticalUp", 0.5789473684210527],
-        ["setWeight", "Thumb", 2],
-        ["setWeight", "Index", 2],
-        ["setWeight", "Middle", 2],
-        ["setWeight", "Ring", 2],
-        ["setWeight", "Pinky", 2]
-      ],
-      enabled: true
-    }
-    );
-
-    handsfree.useGesture({
-      "name": "B",
-      "algorithm": "fingerpose",
-      "models": "hands",
-      "confidence": 7.5,
-      "description": [
-        [
-          "addCurl",
-          "Thumb",
-          "HalfCurl",
-          1
-        ],
-        [
-          "addDirection",
-          "Thumb",
-          "VerticalUp",
-          1
-        ],
-        [
-          "addCurl",
-          "Index",
-          "NoCurl",
-          1
-        ],
-        [
-          "addDirection",
-          "Index",
-          "VerticalUp",
-          1
-        ],
-        [
-          "addCurl",
-          "Middle",
-          "NoCurl",
-          1
-        ],
-        [
-          "addDirection",
-          "Middle",
-          "VerticalUp",
-          1
-        ],
-        [
-          "addCurl",
-          "Ring",
-          "NoCurl",
-          1
-        ],
-        [
-          "addDirection",
-          "Ring",
-          "VerticalUp",
-          1
-        ],
-        [
-          "addCurl",
-          "Pinky",
-          "NoCurl",
-          1
-        ],
-        [
-          "addDirection",
-          "Pinky",
-          "VerticalUp",
-          1
-        ],
-        [
-          "setWeight",
-          "Thumb",
-          2
-        ]
-      ],
-      "enabled": true
-    })
+    const gestures = detectorModel;
 
 
-    console.log('Handsfree initialized:', handsfree.gesture);
+    gestures.forEach((gesture: any) => {
+      handsfree.useGesture(gesture);
+    });
+
+
+
+  
 
     handsfree.start();
 
     handsfree.enablePlugins('browser');
-  
+
     handsfree.use('gestureModel', (data: any) => {
-      console.log(data)
+
       if (!data.hands?.gesture || data.hands.gesture.length === 0) {
-        setLetter(''); // Reset when no gesture is detected
+        setLetter(''); 
         return;
       }
-  
-      const detectedGesture = data.hands.gesture[0]; // Take the first detected gesture
+
+      const detectedGesture = data.hands.gesture[0]; 
       if (detectedGesture?.name) {
-        console.log('Detected Gesture:', detectedGesture.name);
         setLetter(detectedGesture.name);
+
+      } else {
+        setLetter('');
       }
     });
 
