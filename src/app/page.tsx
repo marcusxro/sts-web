@@ -21,25 +21,6 @@ export default function FingerspellingDetection() {
   const [model, setModel] = useState<tf.LayersModel | any>(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
 
-  // Load the trained model
-  useEffect(() => {
-    const loadModel = async () => {
-      try {
-        const loadedModel = await tf.loadLayersModel('/model/model.json');
-        setModel(loadedModel);
-        setIsModelLoaded(true);
-        console.log("✅ Model loaded successfully");
-      } catch (error) {
-        console.error("❌ Error loading model:", error);
-      }
-    };
-
-    loadModel();
-
-
-  }, []);
-
-
   useEffect(() => {
     if (!isModelLoaded || !canvasRef.current) return;
 
@@ -57,19 +38,14 @@ export default function FingerspellingDetection() {
 
     const gestures = detectorModel;
 
-
     gestures.forEach((gesture: any) => {
       handsfree.useGesture(gesture);
     });
 
 
 
-  
-
     handsfree.start();
-
     handsfree.enablePlugins('browser');
-
     handsfree.use('gestureModel', (data: any) => {
 
       if (!data.hands?.gesture || data.hands.gesture.length === 0) {
@@ -188,7 +164,6 @@ export default function FingerspellingDetection() {
       handsfree.stop();
     };
   }, [isModelLoaded]);
-
 
 
   return (
